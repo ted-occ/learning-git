@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Git ハンズオン研修
 
-## Getting Started
+新入社員向け Git / GitHub ハンズオン研修のプレビュー & 進捗管理アプリです。
 
-First, run the development server:
+## 概要
+
+2日間のハンズオン研修で使用するマークダウン資料を、ブラウザ上で見やすく表示します。
+講師がリアルタイムで受講者の進捗を把握できるダッシュボード機能を備えています。
+
+### 研修内容
+
+- **Day 1** — Git基本操作（GitHubアカウント作成、add / commit / push）
+- **Day 2** — ブランチとPull Request
+
+### 主な機能
+
+- マークダウンプレビュー（コラムの折りたたみ表示）
+- 受講者の座席番号による識別
+- セクションごとの「できた」チェックポイント
+- コマンド実行ごとのOK / エラー報告（通し番号付き）
+- 「助けてほしい」ヘルプシグナルボタン
+- 講師ダッシュボード（リアルタイム進捗マトリクス、ヘルプリクエスト通知）
+
+## セットアップ
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 でアプリが起動します。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 使い方
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 受講者
 
-## Learn More
+1. `http://<講師のIP>:3000/day1` にアクセス
+2. 座席番号（1〜15）を入力
+3. ハンズオンを進めながら、コマンド実行後に「OK」または「エラーが出た」を報告
+4. セクション完了時に「できた」をクリック
+5. 困ったら右下の「助けてほしい」ボタンを押す
 
-To learn more about Next.js, take a look at the following resources:
+### 講師
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. `http://localhost:3000/day1?seat=0` で講師としてハンズオンを進行
+2. `http://localhost:3000/dashboard` で全受講者の進捗をリアルタイム確認
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### テスト
 
-## Deploy on Vercel
+同じブラウザで複数の座席をテストする場合は、URLパラメータを使います。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+http://localhost:3000/day1?seat=0   # 講師
+http://localhost:3000/day1?seat=1   # 座席1
+http://localhost:3000/day1?seat=2   # 座席2
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 技術スタック
+
+- [Next.js](https://nextjs.org/) 16（App Router）
+- [React](https://react.dev/) 19
+- [Tailwind CSS](https://tailwindcss.com/) v4
+- [react-markdown](https://github.com/remarkjs/react-markdown) + remark-gfm
+- インメモリデータストア（外部DB不要）
+
+## ライセンス
+
+[MIT](./LICENSE)
