@@ -108,6 +108,18 @@ body {
   border-radius: 0.5rem !important;
   letter-spacing: 0 !important;
 }
+
+/* コードブロックのホバーアニメーション */
+.prose.jp-article pre {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  will-change: transform !important;
+}
+.prose.jp-article pre:hover {
+  transform: scale(1.03) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
 .jp-article :not(pre) > code {
   font-size: 0.88em !important;
   padding: 0.2em 0.4em !important;

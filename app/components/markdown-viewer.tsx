@@ -235,7 +235,7 @@ function StepContent({
           const commandId = `${dayId}:${stepId || "intro"}:cmd${currentLocal}`;
           return (
             <div key={k}>
-              <div className="prose prose-zinc max-w-none dark:prose-invert jp-article">
+              <div className="prose prose-zinc max-w-none dark:prose-invert jp-article overflow-visible">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {part.content}
                 </ReactMarkdown>
