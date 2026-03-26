@@ -148,7 +148,7 @@ export default function MarkdownViewer({
               </span>
             </summary>
             <div className="border-t border-amber-200 px-8 py-1 dark:border-amber-900">
-              <div className="prose prose-zinc max-w-none dark:prose-invert">
+              <div className="prose prose-zinc max-w-none dark:prose-invert jp-article">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {removeColumnHeading(section.content)}
                 </ReactMarkdown>
@@ -166,7 +166,7 @@ export default function MarkdownViewer({
         ) : (
           <div
             key={i}
-            className="prose prose-zinc max-w-none dark:prose-invert"
+            className="prose prose-zinc max-w-none dark:prose-invert jp-article"
           >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {section.content}
@@ -241,7 +241,7 @@ function StepContent({
           const commandId = `${dayId}:${stepId || "intro"}:cmd${currentLocal}`;
           return (
             <div key={k}>
-              <div className="prose prose-zinc max-w-none dark:prose-invert">
+              <div className="prose prose-zinc max-w-none dark:prose-invert jp-article">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {part.content}
                 </ReactMarkdown>
@@ -257,7 +257,7 @@ function StepContent({
         return (
           <div
             key={k}
-            className="prose prose-zinc max-w-none dark:prose-invert"
+            className="prose prose-zinc max-w-none dark:prose-invert jp-article"
           >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {part.content}

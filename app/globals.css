@@ -23,5 +23,138 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+}
+
+/* ─── 日本語マークダウン組版 ─── */
+/* prose クラスの上から確実に上書きするため !important を使用 */
+
+.jp-article {
+  font-size: 0.95rem !important;
+  line-height: 2 !important;
+  letter-spacing: 0.04em !important;
+  word-break: auto-phrase !important;
+  overflow-wrap: break-word !important;
+  color: var(--foreground) !important;
+}
+
+/* 段落 */
+.jp-article p {
+  margin-top: 0.8em !important;
+  margin-bottom: 0.8em !important;
+}
+
+/* 見出し */
+.jp-article h1 {
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  line-height: 1.5 !important;
+  margin-top: 2.4em !important;
+  margin-bottom: 0.8em !important;
+  letter-spacing: 0.06em !important;
+}
+.jp-article h2 {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  margin-top: 2.2em !important;
+  margin-bottom: 0.6em !important;
+  padding-bottom: 0.35em !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+  letter-spacing: 0.05em !important;
+}
+.jp-article h3 {
+  font-size: 1.08rem !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  margin-top: 1.8em !important;
+  margin-bottom: 0.5em !important;
+  letter-spacing: 0.03em !important;
+}
+.jp-article h4 {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  line-height: 1.6 !important;
+  margin-top: 1.4em !important;
+  margin-bottom: 0.4em !important;
+}
+
+/* リスト */
+.jp-article ul,
+.jp-article ol {
+  margin-top: 0.6em !important;
+  margin-bottom: 0.6em !important;
+  padding-left: 1.8em !important;
+}
+.jp-article li {
+  margin-top: 0.25em !important;
+  margin-bottom: 0.25em !important;
+  line-height: 1.9 !important;
+  text-indent: 0 !important;
+}
+.jp-article li > ul,
+.jp-article li > ol {
+  margin-top: 0.2em !important;
+  margin-bottom: 0.2em !important;
+}
+
+/* コードブロック */
+.jp-article pre {
+  margin-top: 0.8em !important;
+  margin-bottom: 0.8em !important;
+  padding: 1em 1.2em !important;
+  font-size: 0.88rem !important;
+  line-height: 1.7 !important;
+  border-radius: 0.5rem !important;
+  letter-spacing: 0 !important;
+}
+.jp-article :not(pre) > code {
+  font-size: 0.88em !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 0.25rem !important;
+  letter-spacing: 0 !important;
+}
+
+/* 引用 */
+.jp-article blockquote {
+  margin-top: 1em !important;
+  margin-bottom: 1em !important;
+  padding: 0.5em 1.2em !important;
+  font-size: 0.92rem !important;
+  line-height: 1.9 !important;
+  border-left-width: 3px !important;
+}
+.jp-article blockquote p {
+  margin-top: 0.4em !important;
+  margin-bottom: 0.4em !important;
+}
+
+/* テーブル */
+.jp-article table {
+  font-size: 0.9rem !important;
+  margin-top: 1em !important;
+  margin-bottom: 1em !important;
+  line-height: 1.7 !important;
+}
+.jp-article th,
+.jp-article td {
+  padding: 0.5em 0.8em !important;
+}
+
+/* 水平線 */
+.jp-article hr {
+  margin-top: 2.5em !important;
+  margin-bottom: 2.5em !important;
+}
+
+/* 強調 */
+.jp-article strong {
+  font-weight: 800 !important;
+}
+
+/* ダークモード */
+@media (prefers-color-scheme: dark) {
+  .jp-article h2 {
+    border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+  }
 }
