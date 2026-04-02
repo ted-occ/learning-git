@@ -26,7 +26,7 @@ type Column = {
 
 const TRAINEE_SEATS = Array.from({ length: 15 }, (_, i) => i + 1);
 const POLL_INTERVAL = 2000;
-const SEAT_COL_W = 60;
+const SEAT_COL_W = 90;
 const CELL_COL_W = 44;
 
 export default function DashboardClient() {
@@ -34,6 +34,7 @@ export default function DashboardClient() {
   const [helpRequests, setHelpRequests] = useState<HelpRequest[]>([]);
   const [commandData, setCommandData] = useState<CommandData | null>(null);
   const [activeDay, setActiveDay] = useState<string | null>(null);
+  const [seatedUsers, setSeatedUsers] = useState<number[]>([]);
   const headerRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const prevLecturerLastCol = useRef<string | null>(null);
@@ -41,16 +42,18 @@ export default function DashboardClient() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [progRes, helpRes, cmdRes, dayRes] = await Promise.all([
+      const [progRes, helpRes, cmdRes, dayRes, seatRes] = await Promise.all([
         fetch("/api/progress"),
         fetch("/api/help"),
         fetch("/api/command-status"),
         fetch("/api/active-day"),
+        fetch("/api/seats"),
       ]);
       setProgress(await progRes.json());
       setHelpRequests((await helpRes.json()).requests);
       setCommandData(await cmdRes.json());
       setActiveDay((await dayRes.json()).activeDay);
+      setSeatedUsers((await seatRes.json()).seats);
     } catch {
       // retry
     }
@@ -259,13 +262,16 @@ export default function DashboardClient() {
                 {TRAINEE_SEATS.map((seat) => {
                   const hasHelp = seatHasHelp(seat);
                   const hasErr = seatHasError(seat);
+                  const isSeated = seatedUsers.includes(seat);
                   return (
                     <tr key={seat} className={hasHelp ? "bg-red-50 dark:bg-red-950/30" : hasErr ? "bg-orange-50/50 dark:bg-orange-950/20" : ""}>
                       <td className="sticky left-0 z-10 border-b border-r border-zinc-200 bg-white px-2 py-2 font-medium text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
-                        <div className="flex items-center gap-2">
-                          {hasHelp && <span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" />}
-                          {hasErr && !hasHelp && <span className="inline-block h-2.5 w-2.5 rounded-full bg-orange-500" />}
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                          {hasHelp && <span className="inline-block h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-red-500" />}
+                          {hasErr && !hasHelp && <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-orange-500" />}
+                          {!hasHelp && !hasErr && isSeated && <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-green-500" />}
                           {seat}
+                          {!isSeated && <span className="text-[10px] text-zinc-400">空席</span>}
                         </div>
                       </td>
                       {renderCells(seat, false)}

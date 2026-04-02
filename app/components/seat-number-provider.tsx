@@ -60,6 +60,7 @@ export default function SeatNumberProvider({
       const num = parseInt(seatParam, 10);
       if (!isNaN(num) && num >= 0 && num <= 15) {
         setSeatNumber(num);
+        notifySeat(num);
         setLoaded(true);
         return;
       }
@@ -71,17 +72,36 @@ export default function SeatNumberProvider({
       const num = parseInt(saved, 10);
       if (num >= 0 && num <= 15) {
         setSeatNumber(num);
+        notifySeat(num);
       }
     }
     setLoaded(true);
   }, [searchParams, activeDayChecked]);
 
+  function notifySeat(seat: number) {
+    fetch("/api/seats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ seatNumber: seat, action: "seat" }),
+    });
+  }
+
+  function notifyUnseat(seat: number) {
+    fetch("/api/seats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ seatNumber: seat, action: "unseat" }),
+    });
+  }
+
   function handleSubmit(seat: number) {
     localStorage.setItem("seatNumber", String(seat));
     setSeatNumber(seat);
+    notifySeat(seat);
   }
 
   function clearSeat() {
+    if (seatNumber !== null) notifyUnseat(seatNumber);
     localStorage.removeItem("seatNumber");
     setSeatNumber(null);
   }

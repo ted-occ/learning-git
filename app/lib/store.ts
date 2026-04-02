@@ -22,6 +22,7 @@ interface StoreData {
   helpRequests: HelpRequest[];
   steps: Record<string, { id: string; title: string; commandCount: number }[]>;
   activeDay: string | null;
+  seatedUsers: Map<SeatNumber, number>; // seat -> timestamp
 }
 
 const g = globalThis as unknown as { __store?: StoreData };
@@ -32,11 +33,15 @@ if (!g.__store) {
     helpRequests: [],
     steps: {},
     activeDay: null,
+    seatedUsers: new Map(),
   };
 }
-// Ensure commandStatuses exists for stores created before this field was added
+// Ensure fields exist for stores created before these were added
 if (!g.__store.commandStatuses) {
   g.__store.commandStatuses = new Map();
+}
+if (!g.__store.seatedUsers) {
+  g.__store.seatedUsers = new Map();
 }
 const store = g.__store;
 
@@ -119,4 +124,16 @@ export function setActiveDay(dayId: string | null) {
 
 export function getActiveDay(): string | null {
   return store.activeDay ?? null;
+}
+
+export function seatUser(seatNumber: SeatNumber) {
+  store.seatedUsers.set(seatNumber, Date.now());
+}
+
+export function unseatUser(seatNumber: SeatNumber) {
+  store.seatedUsers.delete(seatNumber);
+}
+
+export function getSeatedUsers(): number[] {
+  return Array.from(store.seatedUsers.keys()).sort((a, b) => a - b);
 }
