@@ -1,11 +1,24 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import type { Components } from "react-markdown";
 import CheckpointButton from "./checkpoint-button";
 import CommandStatusButtons from "./command-status-buttons";
+import InteractiveCheckbox from "./interactive-checkbox";
 import type { StepInfo } from "@/app/lib/extract-steps";
+import type { CommandRecord } from "@/app/lib/store";
+
+const markdownComponents: Components = {
+  input: ({ type, checked, ...props }) => {
+    if (type === "checkbox") {
+      return <InteractiveCheckbox defaultChecked={checked} />;
+    }
+    return <input type={type} checked={checked} {...props} />;
+  },
+};
 
 type Section = {
   type: "body" | "column";
@@ -110,6 +123,18 @@ export default function MarkdownViewer({
   seatNumber,
   steps,
 }: MarkdownViewerProps) {
+  const [savedStatuses, setSavedStatuses] = useState<Record<string, CommandRecord>>({});
+
+  useEffect(() => {
+    if (seatNumber === undefined) return;
+    fetch("/api/command-status")
+      .then((r) => r.json())
+      .then((data) => {
+        const mine = data.commandStatuses?.[seatNumber];
+        if (mine) setSavedStatuses(mine);
+      });
+  }, [seatNumber]);
+
   const sections = splitSections(content);
   const showCheckpoints = dayId !== undefined && seatNumber !== undefined;
 
@@ -150,7 +175,7 @@ export default function MarkdownViewer({
             </summary>
             <div className="border-t border-amber-200 px-8 py-1 dark:border-amber-900">
               <div className="prose prose-zinc max-w-none dark:prose-invert jp-article">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
                   {removeColumnHeading(section.content)}
                 </ReactMarkdown>
               </div>
@@ -163,13 +188,14 @@ export default function MarkdownViewer({
             dayId={dayId}
             seatNumber={seatNumber}
             stepStartMap={stepStartMap}
+            savedStatuses={savedStatuses}
           />
         ) : (
           <div
             key={i}
             className="prose prose-zinc max-w-none dark:prose-invert jp-article"
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
               {section.content}
             </ReactMarkdown>
           </div>
@@ -184,11 +210,13 @@ function BodyWithCheckpoints({
   dayId,
   seatNumber,
   stepStartMap,
+  savedStatuses,
 }: {
   content: string;
   dayId: string;
   seatNumber: number;
   stepStartMap: Map<string, number>;
+  savedStatuses: Record<string, CommandRecord>;
 }) {
   const subs = splitSubSections(content);
 
@@ -204,6 +232,7 @@ function BodyWithCheckpoints({
             globalStartIndex={
               sub.stepId ? (stepStartMap.get(sub.stepId) ?? 0) : 0
             }
+            savedStatuses={savedStatuses}
           />
         </div>
       ))}
@@ -217,12 +246,14 @@ function StepContent({
   dayId,
   seatNumber,
   globalStartIndex,
+  savedStatuses,
 }: {
   content: string;
   stepId: string | null;
   dayId: string;
   seatNumber: number;
   globalStartIndex: number;
+  savedStatuses: Record<string, CommandRecord>;
 }) {
   const parts = splitByCodeBlocks(content);
   let localCmdIndex = 0;
@@ -237,7 +268,7 @@ function StepContent({
           return (
             <div key={k}>
               <div className="prose prose-zinc max-w-none dark:prose-invert jp-article overflow-visible">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
                   {part.content}
                 </ReactMarkdown>
               </div>
@@ -245,6 +276,7 @@ function StepContent({
                 commandId={commandId}
                 seatNumber={seatNumber}
                 globalNumber={globalNum}
+                initialStatus={savedStatuses[commandId]?.status ?? null}
               />
             </div>
           );
@@ -254,7 +286,7 @@ function StepContent({
             key={k}
             className="prose prose-zinc max-w-none dark:prose-invert jp-article"
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
               {part.content}
             </ReactMarkdown>
           </div>

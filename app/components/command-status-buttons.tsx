@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LECTURER_SEAT } from "./seat-number-modal";
 
 interface Props {
   commandId: string;
   seatNumber: number;
   globalNumber: number;
+  initialStatus?: "ok" | "error" | null;
 }
 
 type Status = "ok" | "error" | null;
@@ -15,9 +16,14 @@ export default function CommandStatusButtons({
   commandId,
   seatNumber,
   globalNumber,
+  initialStatus = null,
 }: Props) {
-  const [status, setStatus] = useState<Status>(null);
+  const [status, setStatus] = useState<Status>(initialStatus);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialStatus !== null) setStatus(initialStatus);
+  }, [initialStatus]);
 
   const label = `#${globalNumber}`;
   const isLecturer = seatNumber === LECTURER_SEAT;
