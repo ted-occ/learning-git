@@ -22,6 +22,17 @@ export default function Home() {
               GitHubアカウント作成、Git基本操作（add / commit / push）
             </p>
           </Link>
+          <Link
+            href="/day2"
+            className="group rounded-lg border border-zinc-200 bg-white px-6 py-5 transition hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+          >
+            <h2 className="text-lg font-semibold text-zinc-900 group-hover:text-blue-600 dark:text-zinc-100 dark:group-hover:text-blue-400">
+              Day 2：枝分かれして、合流して、まとめる
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              ブランチ、Pull Request、マージ
+            </p>
+          </Link>
         </div>
         <div className="mt-10 border-t border-zinc-200 pt-6 dark:border-zinc-800">
           <Link

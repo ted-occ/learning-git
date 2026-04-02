@@ -45,7 +45,7 @@ export default function SeatNumberModal({
           }}
           autoFocus
           className="mt-4 w-full rounded-lg border border-zinc-300 px-4 py-3 text-center text-2xl font-bold text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-          placeholder="1"
+          placeholder="0"
         />
         {error && (
           <p className="mt-2 text-sm text-red-600 dark:text-red-400">

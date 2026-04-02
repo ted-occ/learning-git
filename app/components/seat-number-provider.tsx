@@ -12,6 +12,7 @@ import SeatNumberModal from "./seat-number-modal";
 
 interface SeatNumberContextValue {
   seatNumber: number;
+  clearSeat: () => void;
 }
 
 const SeatNumberContext = createContext<SeatNumberContextValue | null>(null);
@@ -20,6 +21,12 @@ export function useSeatNumber() {
   const ctx = useContext(SeatNumberContext);
   if (!ctx) throw new Error("useSeatNumber must be used within SeatNumberProvider");
   return ctx.seatNumber;
+}
+
+export function useClearSeat() {
+  const ctx = useContext(SeatNumberContext);
+  if (!ctx) throw new Error("useClearSeat must be used within SeatNumberProvider");
+  return ctx.clearSeat;
 }
 
 export default function SeatNumberProvider({
@@ -59,6 +66,11 @@ export default function SeatNumberProvider({
     setSeatNumber(seat);
   }
 
+  function clearSeat() {
+    localStorage.removeItem("seatNumber");
+    setSeatNumber(null);
+  }
+
   if (!loaded) return null;
 
   if (seatNumber === null) {
@@ -66,7 +78,7 @@ export default function SeatNumberProvider({
   }
 
   return (
-    <SeatNumberContext.Provider value={{ seatNumber }}>
+    <SeatNumberContext.Provider value={{ seatNumber, clearSeat }}>
       {children}
     </SeatNumberContext.Provider>
   );
