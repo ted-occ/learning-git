@@ -7,7 +7,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import SeatNumberModal from "./seat-number-modal";
 
 interface SeatNumberContextValue {
@@ -35,10 +35,25 @@ export default function SeatNumberProvider({
   children: ReactNode;
 }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [seatNumber, setSeatNumber] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [activeDayChecked, setActiveDayChecked] = useState(false);
 
   useEffect(() => {
+    fetch("/api/active-day")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.activeDay) {
+          router.replace("/");
+          return;
+        }
+        setActiveDayChecked(true);
+      });
+  }, [router]);
+
+  useEffect(() => {
+    if (!activeDayChecked) return;
     // URL parameter takes priority: ?seat=N
     const seatParam = searchParams.get("seat");
     if (seatParam !== null) {
@@ -59,7 +74,7 @@ export default function SeatNumberProvider({
       }
     }
     setLoaded(true);
-  }, [searchParams]);
+  }, [searchParams, activeDayChecked]);
 
   function handleSubmit(seat: number) {
     localStorage.setItem("seatNumber", String(seat));
@@ -71,7 +86,7 @@ export default function SeatNumberProvider({
     setSeatNumber(null);
   }
 
-  if (!loaded) return null;
+  if (!activeDayChecked || !loaded) return null;
 
   if (seatNumber === null) {
     return <SeatNumberModal onSubmit={handleSubmit} />;

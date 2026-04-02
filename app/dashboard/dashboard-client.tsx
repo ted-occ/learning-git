@@ -27,12 +27,13 @@ type Column = {
 const TRAINEE_SEATS = Array.from({ length: 15 }, (_, i) => i + 1);
 const POLL_INTERVAL = 2000;
 const SEAT_COL_W = 60;
-const CELL_COL_W = 30;
+const CELL_COL_W = 44;
 
 export default function DashboardClient() {
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const [helpRequests, setHelpRequests] = useState<HelpRequest[]>([]);
   const [commandData, setCommandData] = useState<CommandData | null>(null);
+  const [activeDay, setActiveDay] = useState<string | null>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const prevLecturerLastCol = useRef<string | null>(null);
@@ -40,14 +41,16 @@ export default function DashboardClient() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [progRes, helpRes, cmdRes] = await Promise.all([
+      const [progRes, helpRes, cmdRes, dayRes] = await Promise.all([
         fetch("/api/progress"),
         fetch("/api/help"),
         fetch("/api/command-status"),
+        fetch("/api/active-day"),
       ]);
       setProgress(await progRes.json());
       setHelpRequests((await helpRes.json()).requests);
       setCommandData(await cmdRes.json());
+      setActiveDay((await dayRes.json()).activeDay);
     } catch {
       // retry
     }
@@ -75,7 +78,7 @@ export default function DashboardClient() {
 
   // Build columns
   const allSteps = progress?.steps ?? {};
-  const dayIds = Object.keys(allSteps).sort();
+  const dayIds = Object.keys(allSteps).sort().filter((id) => !activeDay || id === activeDay);
   const columns: Column[] = [];
   let globalCmdNum = 0;
   for (const dayId of dayIds) {
@@ -93,11 +96,12 @@ export default function DashboardClient() {
     }
   }
 
-  const stepGroups: { stepId: string; span: number }[] = [];
+  const stepGroups: { key: string; stepId: string; span: number }[] = [];
   for (const col of columns) {
     const last = stepGroups[stepGroups.length - 1];
-    if (last && last.stepId === col.stepId) last.span++;
-    else stepGroups.push({ stepId: col.stepId, span: 1 });
+    const groupKey = col.fullId.split(":").slice(0, 2).join(":");
+    if (last && last.key === groupKey) last.span++;
+    else stepGroups.push({ key: groupKey, stepId: col.stepId, span: 1 });
   }
 
   const tableWidth = SEAT_COL_W + columns.length * CELL_COL_W;
@@ -169,12 +173,19 @@ export default function DashboardClient() {
     <div className="flex h-screen flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-950">
       {/* Page header */}
       <header className="shrink-0 border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">講師ダッシュボード</h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Git ハンズオン研修 — リアルタイム進捗</p>
-        <div className="mt-2 flex items-center gap-4 text-xs text-zinc-500">
-          <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded bg-green-500" /> できた / OK</span>
-          <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded bg-red-500" /> エラー</span>
-          <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded bg-zinc-200 dark:bg-zinc-700" /> 未報告</span>
+        <div className="flex items-center gap-4">
+          <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">講師ダッシュボード</h1>
+          {activeDay && (
+            <span className="rounded-full bg-blue-600 px-3 py-0.5 text-xs font-medium text-white">
+              {activeDay.replace("day", "Day ")} 開催中
+            </span>
+          )}
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">Git ハンズオン研修 — リアルタイム進捗</span>
+          <div className="ml-auto flex items-center gap-4 text-xs text-zinc-500">
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded bg-green-500" /> OK</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded bg-red-500" /> エラー</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded bg-zinc-200 dark:bg-zinc-700" /> 未報告</span>
+          </div>
         </div>
       </header>
 
@@ -210,7 +221,11 @@ export default function DashboardClient() {
                 <tr>
                   <th rowSpan={2} className="border-b border-r border-zinc-200 bg-white px-2 py-2 text-left text-xs font-semibold text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900">座席</th>
                   {stepGroups.map((g) => (
-                    <th key={g.stepId} colSpan={g.span} className="whitespace-nowrap border-b border-x border-zinc-200 px-1 py-1 text-center text-xs font-semibold text-zinc-700 dark:border-zinc-700 dark:text-zinc-300">{g.stepId}</th>
+                    <th key={g.key} colSpan={g.span} className="overflow-visible border-b border-x border-zinc-200 p-0 text-center text-xs font-semibold text-zinc-700 dark:border-zinc-700 dark:text-zinc-300">
+                      <div className="relative flex items-center justify-center py-1">
+                        <span className="whitespace-nowrap">{g.stepId}</span>
+                      </div>
+                    </th>
                   ))}
                 </tr>
                 <tr>

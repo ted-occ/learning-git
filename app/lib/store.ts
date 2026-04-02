@@ -21,6 +21,7 @@ interface StoreData {
   commandStatuses: Map<SeatNumber, Map<string, CommandRecord>>;
   helpRequests: HelpRequest[];
   steps: Record<string, { id: string; title: string; commandCount: number }[]>;
+  activeDay: string | null;
 }
 
 const g = globalThis as unknown as { __store?: StoreData };
@@ -30,6 +31,7 @@ if (!g.__store) {
     commandStatuses: new Map(),
     helpRequests: [],
     steps: {},
+    activeDay: null,
   };
 }
 // Ensure commandStatuses exists for stores created before this field was added
@@ -109,4 +111,12 @@ export function getCommandStatuses(): Record<
     result[seat] = Object.fromEntries(cmds);
   }
   return result;
+}
+
+export function setActiveDay(dayId: string | null) {
+  store.activeDay = dayId;
+}
+
+export function getActiveDay(): string | null {
+  return store.activeDay ?? null;
 }

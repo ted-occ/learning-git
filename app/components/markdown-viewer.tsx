@@ -2,6 +2,7 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import CheckpointButton from "./checkpoint-button";
 import CommandStatusButtons from "./command-status-buttons";
 import type { StepInfo } from "@/app/lib/extract-steps";
@@ -149,7 +150,7 @@ export default function MarkdownViewer({
             </summary>
             <div className="border-t border-amber-200 px-8 py-1 dark:border-amber-900">
               <div className="prose prose-zinc max-w-none dark:prose-invert jp-article">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                   {removeColumnHeading(section.content)}
                 </ReactMarkdown>
               </div>
@@ -168,7 +169,7 @@ export default function MarkdownViewer({
             key={i}
             className="prose prose-zinc max-w-none dark:prose-invert jp-article"
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
               {section.content}
             </ReactMarkdown>
           </div>
@@ -192,9 +193,9 @@ function BodyWithCheckpoints({
   const subs = splitSubSections(content);
 
   return (
-    <>
+    <div>
       {subs.map((sub, j) => (
-        <div key={j}>
+        <div key={sub.stepId ?? `frag-${j}`}>
           <StepContent
             content={sub.content}
             stepId={sub.stepId}
@@ -206,7 +207,7 @@ function BodyWithCheckpoints({
           />
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -236,7 +237,7 @@ function StepContent({
           return (
             <div key={k}>
               <div className="prose prose-zinc max-w-none dark:prose-invert jp-article overflow-visible">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                   {part.content}
                 </ReactMarkdown>
               </div>
@@ -253,7 +254,7 @@ function StepContent({
             key={k}
             className="prose prose-zinc max-w-none dark:prose-invert jp-article"
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
               {part.content}
             </ReactMarkdown>
           </div>
